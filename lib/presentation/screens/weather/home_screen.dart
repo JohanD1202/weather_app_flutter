@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:weather_app/config/constants/country_names.dart';
 import 'package:weather_app/domain/entities/weather.dart';
 import 'package:weather_app/infrastructure/services/location/geolocation_service.dart';
+import 'package:weather_app/presentation/providers/weather/current_location_provider.dart';
 import 'package:weather_app/presentation/providers/weather/weather_by_location_provider.dart';
 import 'package:weather_app/presentation/screens/screens.dart';
 import 'package:weather_app/presentation/widgets/shared/weather_bottom_navigation.dart';
@@ -147,12 +148,14 @@ class _HomeViewState extends ConsumerState<_HomeView> {
       setState(() {
         coords = {'lat': position.latitude, 'lon': position.longitude};
       });
+      ref.read(currentLocationProvider.notifier).state = coords;
     } catch(e) {
       if(!mounted) return;
 
       setState(() {
         coords = {'lat': 3.42, 'lon': -76.52};
       });
+      ref.read(currentLocationProvider.notifier).state = coords;
     }
   }
 
@@ -225,8 +228,7 @@ class _WeatherInfo extends StatelessWidget {
                   cloudiness: weather.cloudiness,
                   pressure: weather.pressure,
                 ),
-                const SizedBox(height: 30),
-                
+                const SizedBox(height: 30),               
               ]
             ),
           )
