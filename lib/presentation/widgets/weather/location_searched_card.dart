@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:weather_app/config/constants/country_names.dart';
 import 'package:weather_app/domain/entities/weather.dart';
@@ -18,9 +19,15 @@ class LocationSearchedCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(10, 0, 15, 10),
       child: SizedBox(
         height: 90,
-        child: _Card(
-          weatherMain: weather.main,
-          weather: weather,
+        child: GestureDetector(
+          onTap: () => context.push(
+            '/weather-detail',
+            extra: weather
+          ),
+          child: _Card(
+            weatherMain: weather.main,
+            weather: weather,
+          ),
         )
       ),
     );

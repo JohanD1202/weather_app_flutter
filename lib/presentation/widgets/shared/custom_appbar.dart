@@ -14,60 +14,79 @@ class CustomAppbar extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
         child: Row(
           children: [
-            Expanded(
+            const Expanded(
               child: SizedBox(
                 height: 50,
-                child: TextField(
-                  style: const TextStyle(color: Colors.black),
-                  textInputAction: TextInputAction.search,
-
-                  onSubmitted:(value) async {
-                    final query = value.trim();
-                    if (query.isEmpty) return;
-
-                    try {
-                      await ref.read(weatherByCityProvider.notifier).search(query);
-
-                      final weather = ref.read(weatherByCityProvider).value;
-                      if(weather == null) throw Exception("Ciudad no encontrada");
-
-                      ref.read(searchedWeatherProvider.notifier).update(
-                        (state) => [...state, weather],
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Ciudad no encontrada")),
-                      );
-                    }
-                  },
-
-                  decoration: InputDecoration(
-                    hintText: "Ingrese el nombre de la ciudad",
-                    hintStyle: const TextStyle(color: Colors.grey),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.lightBlue,
-                        width: 2,
-                      ),
-                    ),
-                    prefixIcon: const Icon(
-                      LucideIcons.search,
-                      color: Colors.black,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                  ),
-                ),
+                child: _TextField(),
               ),
             ),
-
             const SizedBox(width: 20),
+            const Icon(
+              LucideIcons.refreshCcw,
+              color: Colors.black,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-            GestureDetector(
+class _TextField extends ConsumerWidget {
+  const _TextField();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return TextField(
+      style: const TextStyle(color: Colors.black),
+      textInputAction: TextInputAction.search,
+      decoration: InputDecoration(
+      hintText: "Ingrese el nombre de la ciudad",
+      hintStyle: const TextStyle(color: Colors.grey),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.grey),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(
+          color: Colors.lightBlue,
+          width: 2,
+        ),
+      ),
+      prefixIcon: const Icon(
+        LucideIcons.search,
+        color: Colors.black,
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+    ),
+    onSubmitted:(value) async {
+      final query = value.trim();
+      if(query.isEmpty) return;
+
+      final messenger = ScaffoldMessenger.of(context);
+
+      try {
+        await ref.read(weatherByCityProvider.notifier).search(query);
+
+        final weather = ref.read(weatherByCityProvider).value;
+        if(weather == null) throw Exception("Ciudad no encontrada");
+
+        ref.read(searchedWeatherProvider.notifier).update(
+          (state) => [...state, weather],
+        );
+      } catch (e) {
+        messenger.showSnackBar(
+          const SnackBar(content: Text("Ciudad no encontrada")),
+        );
+      }
+    },
+    );
+  }
+}
+
+/*
+GestureDetector(
               onTap: () async {
                 final lastState = ref.read(weatherByCityProvider);
                 final lastCity = lastState.value?.city;
@@ -89,9 +108,4 @@ class CustomAppbar extends ConsumerWidget {
                 color: Colors.black,
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+            */
