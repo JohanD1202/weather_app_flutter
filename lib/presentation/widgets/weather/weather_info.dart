@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_app/config/constants/country_names.dart';
 import 'package:weather_app/domain/entities/weather.dart';
 import 'package:weather_app/presentation/widgets/weather/weather_background.dart';
+import 'package:weather_app/presentation/widgets/weather/weather_clock.dart';
 import 'package:weather_app/presentation/widgets/weather/weather_secondary_information.dart';
+import 'package:weather_app/presentation/widgets/weather/weather_tertiary_information.dart';
 
 class WeatherInfo extends StatelessWidget {
 
@@ -22,10 +25,16 @@ class WeatherInfo extends StatelessWidget {
     return Stack(
         children: [
           WeatherBackground(weatherMain: weather.main),
-          Center(
+          SingleChildScrollView(
             child: Column(
               children: [
-                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 100),
+                  child: WeatherClock(
+                    timezone: weather.timezone,
+                  )
+                ),
+                const SizedBox(height: 150),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.7,
                   child: Text(weather.city,
@@ -72,7 +81,17 @@ class WeatherInfo extends StatelessWidget {
                   cloudiness: weather.cloudiness,
                   pressure: weather.pressure,
                 ),
-                const SizedBox(height: 30),               
+                const SizedBox(height: 30),
+                WeatherTertiaryInformation(
+                  visibility: weather.visibility,
+                  tempMin: weather.tempMin,
+                  tempMax: weather.tempMax,
+                  sunrise: weather.sunrise,
+                  sunset: weather.sunset,
+                  windGust: weather.windGust,
+                  timezone: weather.timezone,
+                ),
+                const SizedBox(height: 30),
               ]
             ),
           )

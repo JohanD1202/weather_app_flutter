@@ -1,21 +1,25 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
-Future<List<String>> getFavorites() async {
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:weather_app/domain/entities/weather.dart';
+
+Future<List<Weather>> getFavorites() async {
   final prefs = await SharedPreferences.getInstance();
-  // Devuelve la lista de ciudades guardadas, o lista vacía si no hay ninguna
-  return prefs.getStringList('favorites') ?? [];
+  final jsonList = prefs.getStringList('favorites') ?? [];
+  return jsonList.map((e) => Weather.fromJson(jsonDecode(e))).toList();
 }
 
-Future<void> toggleFavorite(String city) async {
+Future<void> toggleFavorite(Weather weather) async {
   final prefs = await SharedPreferences.getInstance();
-  final favorites = prefs.getStringList('favorites') ?? [];
+  final jsonList = prefs.getStringList('favorites') ?? [];
 
-  if (favorites.contains(city)) {
-    favorites.remove(city);
+  final weatherJson = jsonEncode(weather.toJson());
+
+  if (jsonList.contains(weatherJson)) {
+    jsonList.remove(weatherJson);
   } else {
-    favorites.add(city);
+    jsonList.add(weatherJson);
   }
 
-  await prefs.setStringList('favorites', favorites);
+  await prefs.setStringList('favorites', jsonList);
 }
-

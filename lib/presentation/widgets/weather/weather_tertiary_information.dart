@@ -1,28 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
-class WeatherSecondaryInformation extends StatelessWidget {
-  final double feelsLike;
-  final double windSpeed;
-  final int windDeg;
-  final int humidity;
-  final int cloudiness;
-  final int pressure;
+class WeatherTertiaryInformation extends StatelessWidget {
 
-  const WeatherSecondaryInformation({
+  final int visibility;
+  final double tempMin;
+  final double tempMax;
+  final int sunrise;
+  final int sunset;
+  final double windGust;
+  final int timezone;
+
+  const WeatherTertiaryInformation({
     super.key,
-    required this.feelsLike,
-    required this.windSpeed,
-    required this.windDeg,
-    required this.humidity,
-    required this.cloudiness,
-    required this.pressure
+    required this.visibility,
+    required this.tempMin,
+    required this.tempMax,
+    required this.sunrise,
+    required this.sunset,
+    required this.windGust,
+    required this.timezone
   });
 
   @override
   Widget build(BuildContext context) {
 
-    final windSpeedKm = windSpeed * 3.6;
+    final gustKmH = windGust * 3.6;
+    final gustText = (windGust == 0.0)
+      ? "N/A"
+      : "${gustKmH.toStringAsFixed(1)} km/h";
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -38,16 +45,16 @@ class WeatherSecondaryInformation extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _InfoItem(
-                  title: "Sensación",
-                  value: "${feelsLike.toStringAsFixed(1)} °C",
+                  title: "Visibilidad",
+                  value: formatVisibility(visibility),
                 ),
                 _InfoItem(
-                  title: "Viento",
-                  value: "${windSpeedKm.toStringAsFixed(1)} km/h",
+                  title: "Temp. min",
+                  value: "${tempMin.toStringAsFixed(1)} °C",
                 ),
                 _InfoItem(
-                  title: "Dirección",
-                  value: windDirection(windDeg),
+                  title: "Temp. max",
+                  value: "${tempMax.toStringAsFixed(1)} °C",
                 ),
               ],
             ),
@@ -57,16 +64,16 @@ class WeatherSecondaryInformation extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _InfoItem(
-                  title: "Humedad",
-                  value: "$humidity%",
+                  title: "Ráfaga",
+                  value: gustText,
                 ),
                 _InfoItem(
-                  title: "Nubosidad",
-                  value: "$cloudiness%",
+                  title: "Amanecer",
+                  value: formatSunTime(sunrise, timezone),
                 ),
                 _InfoItem(
-                  title: "Presión",
-                  value: "$pressure hPa",
+                  title: "Atardecer",
+                  value: formatSunTime(sunset, timezone),
                 ),
               ],
             ),
@@ -76,6 +83,8 @@ class WeatherSecondaryInformation extends StatelessWidget {
     );
   }
 }
+
+
 class _InfoItem extends StatelessWidget {
   final String title;
   final String value;
@@ -101,7 +110,7 @@ class _InfoItem extends StatelessWidget {
         Text(
           value,
           style: GoogleFonts.inter(
-            fontSize: 17,
+            fontSize: 15,
             fontWeight: FontWeight.w500,
             color: Colors.black,
           ),
@@ -111,16 +120,17 @@ class _InfoItem extends StatelessWidget {
   }
 }
 
-String windDirection(int deg) {
-  if(deg >= 337 || deg < 23) return "Norte";
-  if(deg >= 23 && deg < 68) return "Noreste";
-  if(deg >= 68 && deg < 113) return "Este";
-  if(deg >= 113 && deg < 158) return "Sureste";
-  if(deg >= 158 && deg < 203) return "Sur";
-  if(deg >= 203 && deg < 248) return "Suroeste";
-  if(deg >= 248 && deg < 293) return "Oeste";
-  if(deg >= 293 && deg < 337) return "Noroeste";
-
-  return "N/A";
+String formatSunTime(int unix, int timezone) {
+  final utcDate = DateTime.fromMillisecondsSinceEpoch(unix * 1000, isUtc: true);
+  final localDate = utcDate.add(Duration(seconds: timezone));
+  return DateFormat('hh:mm a').format(localDate);
 }
 
+String formatVisibility(int visibility) {
+  if (visibility >= 1000) {
+    final km = (visibility / 1000).toStringAsFixed(1);
+    return "$km km";
+  } else {
+    return "$visibility m";
+  }
+}

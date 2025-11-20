@@ -32,15 +32,15 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
   void _loadFavorite() async {
     final favorites = await getFavorites();
     setState(() {
-      isFavorite = favorites.contains(widget.weather.city);
+      isFavorite = favorites.any((w) => w.city == widget.weather.city);
     });
   }
 
   void _toggleFavorite() async {
-    await toggleFavorite(widget.weather.city);
+    await toggleFavorite(widget.weather); // objeto completo
     final favorites = await getFavorites();
     setState(() {
-      isFavorite = favorites.contains(widget.weather.city);
+      isFavorite = favorites.any((w) => w.city == widget.weather.city);
     });
   }
 

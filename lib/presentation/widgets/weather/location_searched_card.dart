@@ -71,8 +71,6 @@ class _Card extends StatelessWidget {
           _InfoLocationCard(
             weather.city,
             countryFullName,
-            weather.description,
-            weather.temperature
           ),
           const Spacer(),
           _InfoTemperature(
@@ -89,14 +87,10 @@ class _InfoLocationCard extends StatelessWidget {
 
   final String city;
   final String country;
-  final String description;
-  final double temperature;
 
   const _InfoLocationCard(
     this.city,
     this.country,
-    this.description,
-    this.temperature
   );
 
   @override
@@ -120,7 +114,7 @@ class _InfoLocationCard extends StatelessWidget {
           Text(country, style: GoogleFonts.inter(
             fontSize: 10,
             fontWeight: FontWeight.w500
-          )),  
+          )),
         ],
       ),
     );

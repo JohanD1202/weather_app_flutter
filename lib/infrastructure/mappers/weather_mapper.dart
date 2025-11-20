@@ -15,11 +15,17 @@ class WeatherMapper {
     main: openWeather.weather.isNotEmpty
     ? openWeather.weather.first.main
     : '',
-    date: DateTime.fromMillisecondsSinceEpoch(openWeather.dt * 1000, isUtc: true),
     country: openWeather.sys.country.isNotEmpty
     ? openWeather.sys.country
     : 'No disponible',
     cloudiness: openWeather.clouds.all,
-    pressure: openWeather.main.pressure
+    pressure: openWeather.main.pressure,
+    timezone: openWeather.timezone,
+    visibility: openWeather.visibility,
+    tempMin: openWeather.main.tempMin,
+    tempMax: openWeather.main.tempMax,
+    sunrise: openWeather.sys.sunrise,
+    sunset: openWeather.sys.sunset,
+    windGust: openWeather.wind.gust ?? 0.0
   );
 }

@@ -6,7 +6,7 @@ import 'package:weather_app/config/theme/app_theme.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
-  runApp(ProviderScope(child: const MainApp()));
+  runApp(const ProviderScope(child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -21,3 +21,5 @@ class MainApp extends StatelessWidget {
     );
   }
 }
+
+
