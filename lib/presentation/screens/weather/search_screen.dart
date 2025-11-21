@@ -8,13 +8,14 @@ import 'package:weather_app/presentation/providers/weather/is_refreshing_provide
 import 'package:weather_app/presentation/providers/weather/weather_by_city.dart';
 import 'package:weather_app/presentation/providers/weather/weather_by_location_provider.dart';
 import 'package:weather_app/presentation/providers/weather/searched_weather_provider.dart';
+import 'package:weather_app/presentation/widgets/shared/localized_text.dart';
 import 'package:weather_app/presentation/widgets/weather/current_location_card.dart';
 import 'package:weather_app/presentation/widgets/shared/custom_appbar.dart';
 import 'package:weather_app/presentation/widgets/weather/location_searched_card.dart';
 
-class SavedScreen extends StatelessWidget {
+class SearchScreen extends StatelessWidget {
   static const name = "saved-screen";
-  const SavedScreen({super.key});
+  const SearchScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -74,43 +75,51 @@ class _BodySavedScreen extends ConsumerWidget {
                   itemBuilder: (_, i) {
                     final city = cities[i];
 
-                    final countryFullName = countryNames[city.country] ?? city.country;
+                    final countryTranslations = countryNames[city.country] ?? {
+                      "es": city.country,
+                      "en": city.country
+                    };
+
                     return ListTile(
-                      title: Text("${city.name}, $countryFullName",
-                      style: TextStyle(color: suggestionText),
-                      ),
-                      subtitle: city.state != null
+                      title: LocalizedText(
+                        translations: {
+                          "es": "${city.name}, ${countryTranslations["es"]}",
+                          "en": "${city.name}, ${countryTranslations["en"]}"
+                        },
+                        style: TextStyle(color: suggestionText),
+                        ),
+                        subtitle: city.state != null
                           ? Text(city.state!)
                           : const Text(""),
-                      onTap: () async {
-                        final messenger = ScaffoldMessenger.of(context);
-                        FocusScope.of(context).unfocus();
+                        onTap: () async {
+                          final messenger = ScaffoldMessenger.of(context);
+                          FocusScope.of(context).unfocus();
 
-                        final cityNameNormalized = city.name.trim().toLowerCase();
-                        final countryNormalized = city.country.trim().toLowerCase();
+                          final cityNameNormalized = city.name.trim().toLowerCase();
+                          final countryNormalized = city.country.trim().toLowerCase();
 
-                        final existingList = ref.read(searchedWeatherProvider);
-                        final exists = existingList.any(
-                          (w) =>
+                          final existingList = ref.read(searchedWeatherProvider);
+                          final exists = existingList.any(
+                            (w) =>
                               w.city.trim().toLowerCase() == cityNameNormalized &&
                               w.country.trim().toLowerCase() == countryNormalized,
-                        );
-
-                        if (exists) {
-                          messenger.showSnackBar(
-                            const SnackBar(content: Text("La ciudad ya está en la lista")),
                           );
+
+                          if(exists) {
+                            messenger.showSnackBar(
+                              const SnackBar(content: Text("La ciudad ya está en la lista")),
+                            );
+                            ref.read(searchQueryProvider.notifier).state = '';
+                            return; // salir antes de hacer la búsqueda
+                          }
+
+                          await ref.read(weatherByCityProvider.notifier).search(city.name);
+                          final weather = ref.read(weatherByCityProvider).value;
+                          if (weather != null) {
+                            ref.read(searchedWeatherProvider.notifier).addWeather(weather);
+                          }
+
                           ref.read(searchQueryProvider.notifier).state = '';
-                          return; // salir antes de hacer la búsqueda
-                        }
-
-                        await ref.read(weatherByCityProvider.notifier).search(city.name);
-                        final weather = ref.read(weatherByCityProvider).value;
-                        if (weather != null) {
-                          ref.read(searchedWeatherProvider.notifier).addWeather(weather);
-                        }
-
-                        ref.read(searchQueryProvider.notifier).state = '';
                       },
                     );
                   },

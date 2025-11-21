@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:weather_app/domain/entities/weather.dart';
-import 'package:weather_app/infrastructure/services/shared_preferences/favorites_provider.dart.dart';
+import 'package:weather_app/infrastructure/services/shared_preferences/favorites_provider.dart';
 import 'package:weather_app/presentation/widgets/weather/weather_info.dart';
 
 class WeatherDetailScreen extends ConsumerStatefulWidget {

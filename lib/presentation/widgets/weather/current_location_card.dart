@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:weather_app/config/constants/country_names.dart';
+import 'package:weather_app/config/constants/weather_descriptions.dart';
 import 'package:weather_app/domain/entities/weather.dart';
-import 'package:weather_app/presentation/providers/preferences/unit_provider.dart';
+import 'package:weather_app/presentation/widgets/shared/localized_text.dart';
+import 'package:weather_app/presentation/widgets/shared/temperature_text.dart';
 
 class CurrentLocationCard extends StatelessWidget {
 
@@ -32,7 +33,7 @@ class CurrentLocationCard extends StatelessWidget {
 }
 
 
-class _Card extends ConsumerWidget {
+class _Card extends StatelessWidget {
 
   final String weatherMain;
   final Weather weather;
@@ -43,16 +44,10 @@ class _Card extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
 
     final colors = _getColorsForWeather(weatherMain);
-    final countryFullName = countryNames[weather.country] ?? weather.country;
-    final isFahrenheit = ref.watch(unitProvider);
-    final temp = weather.temperature;
-    
-    final displayTemp = isFahrenheit
-        ? (temp * 9/5 + 32).toStringAsFixed(1)
-        : temp.toStringAsFixed(1);
+    //final countryFullName = countryNames[weather.country] ?? weather.country;
 
     return Container(
       decoration: BoxDecoration(
@@ -72,7 +67,7 @@ class _Card extends ConsumerWidget {
               const Spacer(),
               _InfoCurrentLocationCard(
                 weather.city,
-                countryFullName,
+                weather.country,
                 weather.description,
               )
             ],
@@ -80,11 +75,15 @@ class _Card extends ConsumerWidget {
           Row(
             children: [
               const Padding(
-                padding: EdgeInsets.only(left: 12),
+                padding: EdgeInsets.only(left: 12, bottom: 5),
                 child: Icon(LucideIcons.mapPin, size: 20, color: Colors.lightBlue),
               ),
               const SizedBox(width: 5),
-              Text("Mi Ubicación Actual",
+              LocalizedText(
+                translations: const {
+                  "es": "Mi Ubicación Actual",
+                  "en": "My Current Location"
+                },
               style: GoogleFonts.inter(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
@@ -92,15 +91,17 @@ class _Card extends ConsumerWidget {
               )),
               Padding(
                 padding: const EdgeInsets.only(left: 20),
-                child: Text('$displayTemp°${isFahrenheit ? 'F' : 'C'}', style: GoogleFonts.inter(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black
-                )),
+                child: TemperatureText(
+                  celsius: weather.temperature,
+                  style: GoogleFonts.inter(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black
+                  )
+                ),
               ),
             ],
           )
-          
         ],
       ),
     );
@@ -157,14 +158,19 @@ class _InfoCurrentLocationCard extends StatelessWidget {
               color: Colors.black
             )),
             const SizedBox(height: 3),
-            Text(country, style: GoogleFonts.inter(
+            LocalizedText(
+              translations: countryNames[country] ??
+              {"es": country, "en": country},
+              style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: Colors.black
-
             )),
             const SizedBox(height: 10),
-            Text(description, style:  GoogleFonts.inter(
+            LocalizedText(
+              translations: weatherDescriptions[description.toLowerCase()] ??
+              {"es": description, "en": description},
+              style:  GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: Colors.black

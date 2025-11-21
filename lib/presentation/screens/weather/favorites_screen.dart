@@ -5,8 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:weather_app/config/constants/country_names.dart';
 import 'package:weather_app/domain/entities/weather.dart';
-import 'package:weather_app/infrastructure/services/shared_preferences/favorites_provider.dart.dart';
-import 'package:weather_app/presentation/providers/preferences/unit_provider.dart';
+import 'package:weather_app/infrastructure/services/shared_preferences/favorites_provider.dart';
+import 'package:weather_app/presentation/widgets/shared/localized_text.dart';
+import 'package:weather_app/presentation/widgets/shared/temperature_text.dart';
 
 class FavoritesScreen extends ConsumerWidget {
 
@@ -29,46 +30,57 @@ class FavoritesScreen extends ConsumerWidget {
     final styleIcon = Theme.of(context).iconTheme.color;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Mis Favoritos'),
-      titleTextStyle: styleTitle,
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 20),
-          child: GestureDetector(
-            onTap: () {
-              context.push('/settings');
-            },
-            child: Icon(
-              LucideIcons.settings,
-              color: styleIcon,
-              size: 25,
-            ),
-          ),
-        )
-      ],
-      ),
-      body: favorites.isEmpty
-        ? Center(
-          child: Text("Aún no tienes ciudades favoritas", 
-          style: styleText
+      appBar: AppBar(
+        title: const LocalizedText(
+          translations: {
+            "es": "Mis Favoritos",
+            "en": "My Favorites"
+          }
         ),
-        )
-        : ListView.builder(
-        itemCount: favorites.length,
-        itemBuilder: (context, index) {
-          final weather = favorites[index];
-          return GestureDetector(
-            onTap: () => context.push(
-              '/weather-detail',
-              extra: weather
+        titleTextStyle: styleTitle,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: GestureDetector(
+              onTap: () {
+                context.push('/settings');
+              },
+              child: Icon(
+                LucideIcons.settings,
+                color: styleIcon,
+                size: 25,
+              ),
             ),
-            child: _FavoritesCard(
-              weather: weather,
-              onRemove: () {
-                ref
-                  .read(favoritesProvider.notifier)
-                  .toggle(weather);
-              }
+          )
+        ],
+        ),
+        body: favorites.isEmpty
+          ?
+          Center(
+            child: LocalizedText(
+              translations: const {
+                "es": "Aún no tienes ciudades favoritas",
+                "en": "You don't have any favorite cities yet"
+              },
+              style: styleText
+            ),
+          )
+          : ListView.builder(
+          itemCount: favorites.length,
+          itemBuilder: (context, index) {
+            final weather = favorites[index];
+            return GestureDetector(
+              onTap: () => context.push(
+                '/weather-detail',
+                extra: weather
+              ),
+              child: _FavoritesCard(
+                weather: weather,
+                onRemove: () {
+                  ref
+                    .read(favoritesProvider.notifier)
+                    .toggle(weather);
+                }
             ),
           );
         },
@@ -89,15 +101,13 @@ class _FavoritesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final countryFullName = countryNames[weather.country] ?? weather.country;
-    
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         child: Row(
           children: [
-            _InfoLocationCard(weather.city, countryFullName),
+            _InfoLocationCard(weather.city, weather.country),
             const Spacer(),
             _InfoTemperatureCard(weather.temperature, weather.description),
             IconButton(
@@ -139,7 +149,10 @@ class _InfoLocationCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        Text(country, style: GoogleFonts.inter(
+        LocalizedText(
+          translations: countryNames[country] ??
+          {"es": country, "en": country},
+          style: GoogleFonts.inter(
           fontSize: 10,
           fontWeight: FontWeight.w500
         )),
@@ -148,7 +161,7 @@ class _InfoLocationCard extends StatelessWidget {
   }
 }
 
-class _InfoTemperatureCard extends ConsumerWidget {
+class _InfoTemperatureCard extends StatelessWidget {
 
   final double temperature;
   final String description;
@@ -159,20 +172,14 @@ class _InfoTemperatureCard extends ConsumerWidget {
   );
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-
-    final isFahrenheit = ref.watch(unitProvider);
-    final temp = temperature;
-    
-    final displayTemp = isFahrenheit
-        ? (temp * 9/5 + 32).toStringAsFixed(1)
-        : temp.toStringAsFixed(1);
+  Widget build(BuildContext context) {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text('$displayTemp°${isFahrenheit ? 'F' : 'C'}', 
-        style: GoogleFonts.inter(
+        TemperatureText(
+          celsius: temperature,
+          style: GoogleFonts.inter(
           fontSize: 15,
           fontWeight: FontWeight.w600,
         )),

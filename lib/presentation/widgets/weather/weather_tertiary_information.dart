@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:weather_app/presentation/providers/preferences/unit_provider.dart';
+import 'package:weather_app/presentation/widgets/shared/info_item.dart';
+import 'package:weather_app/presentation/widgets/shared/localized_text.dart';
+import 'package:weather_app/presentation/widgets/shared/temperature_text.dart';
 
-class WeatherTertiaryInformation extends ConsumerWidget {
+class WeatherTertiaryInformation extends StatelessWidget {
 
   final int visibility;
   final double tempMin;
@@ -26,29 +27,25 @@ class WeatherTertiaryInformation extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
 
     final gustKmH = windGust * 3.6;
     final gustText = (windGust == 0.0)
       ? "N/A"
       : "${gustKmH.toStringAsFixed(1)} km/h";
-    final isFahrenheit = ref.watch(unitProvider);
-
-    final displayTempMin = isFahrenheit
-        ? (tempMin * 9/5 + 32).toStringAsFixed(1)
-        : tempMin.toStringAsFixed(1);
+    final colorBackground = Theme.of(context).colorScheme.surface;
+    final TextStyle styleText = GoogleFonts.inter(
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+    );
     
-    final displayTempMax = isFahrenheit
-        ? (tempMax * 9/5 + 32).toStringAsFixed(1)
-        : tempMax.toStringAsFixed(1);
-
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Container(
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.85),
+          color: colorBackground,
           borderRadius: BorderRadius.circular(25),
         ),
         child: Column(
@@ -56,17 +53,39 @@ class WeatherTertiaryInformation extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _InfoItem(
-                  title: "Visibilidad",
+                InfoItem(
+                  titleWidget: LocalizedText(
+                    translations: const {
+                      "es": "Visibilidad",
+                      "en": "Visibility"
+                    },
+                    style: styleText
+                  ),
                   value: formatVisibility(visibility),
                 ),
-                _InfoItem(
-                  title: "Temp. min",
-                  value: '$displayTempMin°${isFahrenheit ? 'F' : 'C'}',
+                InfoItem(
+                  titleWidget: LocalizedText(
+                    translations: const {
+                      "es": "Temp. min",
+                      "en": "Min. Temp"
+                    },
+                    style: styleText
+                  ),
+                  valueWidget: TemperatureText(
+                    celsius: tempMin
+                  ),
                 ),
-                _InfoItem(
-                  title: "Temp. max",
-                  value: '$displayTempMax°${isFahrenheit ? 'F' : 'C'}',
+                InfoItem(
+                  titleWidget: LocalizedText(
+                    translations: const {
+                      "es": "Temp. max",
+                      "en": "Max. Temp"
+                    },
+                    style: styleText
+                  ),
+                  valueWidget: TemperatureText(
+                    celsius: tempMax
+                  ),
                 ),
               ],
             ),
@@ -75,16 +94,34 @@ class WeatherTertiaryInformation extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _InfoItem(
-                  title: "Ráfaga",
+                InfoItem(
+                  titleWidget: LocalizedText(
+                    translations: const {
+                      "es": "Ráfaga",
+                      "en": "Burst"
+                    },
+                    style: styleText
+                  ),
                   value: gustText,
                 ),
-                _InfoItem(
-                  title: "Amanecer",
+                InfoItem(
+                  titleWidget: LocalizedText(
+                    translations: const {
+                      "es": "Amanecer",
+                      "en": "Sunrise"
+                    },
+                    style: styleText
+                  ),
                   value: formatSunTime(sunrise, timezone),
                 ),
-                _InfoItem(
-                  title: "Atardecer",
+                InfoItem(
+                  titleWidget: LocalizedText(
+                    translations: const {
+                      "es": "Atardecer",
+                      "en": "Sunset"
+                    },
+                    style: styleText
+                  ),
                   value: formatSunTime(sunset, timezone),
                 ),
               ],
@@ -92,42 +129,6 @@ class WeatherTertiaryInformation extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-
-class _InfoItem extends StatelessWidget {
-  final String title;
-  final String value;
-
-  const _InfoItem({
-    required this.title,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          title,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
-        ),
-      ],
     );
   }
 }

@@ -21,8 +21,8 @@ final appRouter = GoRouter(
         ),
         GoRoute(
           path: '/saved',
-          name: SavedScreen.name,
-          builder: (context, state) => const SavedScreen(),
+          name: SearchScreen.name,
+          builder: (context, state) => const SearchScreen(),
         ),
         GoRoute(
           path: '/weather-detail',

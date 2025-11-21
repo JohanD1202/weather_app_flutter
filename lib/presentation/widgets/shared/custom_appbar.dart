@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:weather_app/infrastructure/services/shared_preferences/language_provider.dart';
 import 'package:weather_app/presentation/providers/suggestions/search_query_provider.dart';
 import 'package:weather_app/presentation/providers/weather/is_refreshing_provider.dart';
 import 'package:weather_app/presentation/providers/weather/weather_by_city.dart';
 import 'package:weather_app/presentation/providers/weather/searched_weather_provider.dart';
+import 'package:weather_app/presentation/widgets/shared/localized_text.dart';
 
 class CustomAppbar extends ConsumerWidget {
   const CustomAppbar({super.key});
@@ -58,6 +60,10 @@ class _TextField extends ConsumerWidget {
     WidgetRef ref,
     BuildContext context,
   ) async {
+
+    final textTheme = Theme.of(context);
+    final backgroundTheme = Theme.of(context).scaffoldBackgroundColor;
+
     final query = value.trim();
     if (query.isEmpty) return;
   
@@ -79,7 +85,16 @@ class _TextField extends ConsumerWidget {
   
       if (exists) {
         messenger.showSnackBar(
-          const SnackBar(content: Text("La ciudad ya está en la lista")),
+          SnackBar(
+            content: LocalizedText(
+              translations: const  {
+                "es": "La ciudad ya está en la lista",
+                "en": "The city is already on the list"
+              },
+              style: textTheme.textTheme.bodyLarge,
+            ),
+            backgroundColor: backgroundTheme,
+          ),
         );
         return;
       }
@@ -88,13 +103,28 @@ class _TextField extends ConsumerWidget {
       ref.read(searchedWeatherProvider.notifier).addWeather(weather);
     } catch (e) {
       messenger.showSnackBar(
-        const SnackBar(content: Text("Ciudad no encontrada")),
+        SnackBar(
+          content: LocalizedText(
+            translations: const {
+              "es": "Ciudad no encontrada",
+              "en": "City not found"
+            },
+            style: textTheme.textTheme.bodyLarge,
+          ),
+          backgroundColor: backgroundTheme,
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    
+    final lang = ref.watch(languageProvider);
+    final hint = {
+      "es": "Ingrese el nombre de la ciudad",
+      "en": "Enter the city name",
+    }[lang] ?? "Enter the city name";
 
     final textColor = Theme.of(context).textTheme.bodyLarge?.color;
     final hintColor = Theme.of(context).hintColor;
@@ -110,7 +140,7 @@ class _TextField extends ConsumerWidget {
       decoration: InputDecoration(
         filled: true,
         fillColor: fillColor,
-        hintText: "Ingrese el nombre de la ciudad",
+        hintText: hint,
         hintStyle: TextStyle(color: hintColor),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

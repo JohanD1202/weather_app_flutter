@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:weather_app/config/constants/country_names.dart';
+import 'package:weather_app/config/constants/weather_descriptions.dart';
 import 'package:weather_app/domain/entities/weather.dart';
-import 'package:weather_app/presentation/providers/preferences/unit_provider.dart';
 import 'package:weather_app/presentation/providers/weather/searched_weather_provider.dart';
+import 'package:weather_app/presentation/widgets/shared/localized_text.dart';
+import 'package:weather_app/presentation/widgets/shared/temperature_text.dart';
 
 class LocationSearchedCard extends ConsumerWidget {
   final Weather weather;
@@ -62,8 +64,6 @@ class _Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final countryFullName = countryNames[weather.country] ?? weather.country;
-
     return Card(
       elevation: 4,
       child: Row(
@@ -71,7 +71,7 @@ class _Card extends StatelessWidget {
         children: [
           _InfoLocationCard(
             weather.city,
-            countryFullName,
+            weather.country,
           ),
           const Spacer(),
           _InfoTemperature(
@@ -112,7 +112,10 @@ class _InfoLocationCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          Text(country, style: GoogleFonts.inter(
+          LocalizedText(
+            translations: countryNames[country] ??
+            {"es": country, "en": country},
+            style: GoogleFonts.inter(
             fontSize: 10,
             fontWeight: FontWeight.w500
           )),
@@ -122,7 +125,7 @@ class _InfoLocationCard extends StatelessWidget {
   }
 }
 
-class _InfoTemperature extends ConsumerWidget {
+class _InfoTemperature extends StatelessWidget {
   
   final double temperature;
   final String description;
@@ -133,28 +136,27 @@ class _InfoTemperature extends ConsumerWidget {
   );
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-
-    final isFahrenheit = ref.watch(unitProvider);
-    final temp = temperature;
-    
-    final displayTemp = isFahrenheit
-        ? (temp * 9/5 + 32).toStringAsFixed(1)
-        : temp.toStringAsFixed(1);
+  Widget build(BuildContext context) {
 
     return Padding(
       padding: const EdgeInsets.only(right: 20, top: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text('$displayTemp°${isFahrenheit ? 'F' : 'C'}', style: GoogleFonts.inter(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          )),
+          TemperatureText(
+            celsius: temperature,
+            style: GoogleFonts.inter(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            )
+          ),
           const SizedBox(height: 5),
           SizedBox(
             width: 100,
-            child: Text(description, style: GoogleFonts.inter(
+            child: LocalizedText(
+              translations: weatherDescriptions[description.toLowerCase()] ??
+              {"es": description, "en": description},
+              style: GoogleFonts.inter(
               fontSize: 10,
               fontWeight: FontWeight.w500,
             ),
