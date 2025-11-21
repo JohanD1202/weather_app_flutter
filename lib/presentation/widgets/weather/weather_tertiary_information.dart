@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_app/presentation/providers/preferences/unit_provider.dart';
 
-class WeatherTertiaryInformation extends StatelessWidget {
+class WeatherTertiaryInformation extends ConsumerWidget {
 
   final int visibility;
   final double tempMin;
@@ -24,12 +26,22 @@ class WeatherTertiaryInformation extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     final gustKmH = windGust * 3.6;
     final gustText = (windGust == 0.0)
       ? "N/A"
       : "${gustKmH.toStringAsFixed(1)} km/h";
+    final isFahrenheit = ref.watch(unitProvider);
+
+    final displayTempMin = isFahrenheit
+        ? (tempMin * 9/5 + 32).toStringAsFixed(1)
+        : tempMin.toStringAsFixed(1);
+    
+    final displayTempMax = isFahrenheit
+        ? (tempMax * 9/5 + 32).toStringAsFixed(1)
+        : tempMax.toStringAsFixed(1);
+
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -50,11 +62,11 @@ class WeatherTertiaryInformation extends StatelessWidget {
                 ),
                 _InfoItem(
                   title: "Temp. min",
-                  value: "${tempMin.toStringAsFixed(1)} °C",
+                  value: '$displayTempMin°${isFahrenheit ? 'F' : 'C'}',
                 ),
                 _InfoItem(
                   title: "Temp. max",
-                  value: "${tempMax.toStringAsFixed(1)} °C",
+                  value: '$displayTempMax°${isFahrenheit ? 'F' : 'C'}',
                 ),
               ],
             ),

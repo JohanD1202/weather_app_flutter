@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:weather_app/presentation/providers/preferences/unit_provider.dart';
 
-class WeatherSecondaryInformation extends StatelessWidget {
+class WeatherSecondaryInformation extends ConsumerWidget {
   final double feelsLike;
   final double windSpeed;
   final int windDeg;
@@ -20,9 +22,15 @@ class WeatherSecondaryInformation extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     final windSpeedKm = windSpeed * 3.6;
+    final isFahrenheit = ref.watch(unitProvider);
+    final temp = feelsLike;
+    
+    final displayTemp = isFahrenheit
+        ? (temp * 9/5 + 32).toStringAsFixed(1)
+        : temp.toStringAsFixed(1);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -39,7 +47,7 @@ class WeatherSecondaryInformation extends StatelessWidget {
               children: [
                 _InfoItem(
                   title: "Sensación",
-                  value: "${feelsLike.toStringAsFixed(1)} °C",
+                  value: '$displayTemp°${isFahrenheit ? 'F' : 'C'}',
                 ),
                 _InfoItem(
                   title: "Viento",

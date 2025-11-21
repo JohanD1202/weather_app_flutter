@@ -45,6 +45,9 @@ class _BodySavedScreen extends ConsumerWidget {
     final query = ref.watch(searchQueryProvider);
     final suggestionsAsync = ref.watch(citySuggestionProvider(query));
     final isRefreshing = ref.watch(isRefreshingProvider);
+    final theme = Theme.of(context);
+    final suggestionBg = theme.colorScheme.surface;
+    final suggestionText = theme.textTheme.bodyLarge?.color;
 
     
     return Column(
@@ -58,7 +61,7 @@ class _BodySavedScreen extends ConsumerWidget {
                 ),
                 margin: const EdgeInsets.symmetric(horizontal: 15),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: suggestionBg,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: const [
                     BoxShadow(color: Colors.black12, blurRadius: 5)
@@ -73,7 +76,9 @@ class _BodySavedScreen extends ConsumerWidget {
 
                     final countryFullName = countryNames[city.country] ?? city.country;
                     return ListTile(
-                      title: Text("${city.name}, $countryFullName"),
+                      title: Text("${city.name}, $countryFullName",
+                      style: TextStyle(color: suggestionText),
+                      ),
                       subtitle: city.state != null
                           ? Text(city.state!)
                           : const Text(""),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:weather_app/config/constants/country_names.dart';
 import 'package:weather_app/domain/entities/weather.dart';
+import 'package:weather_app/presentation/providers/preferences/unit_provider.dart';
 
 class CurrentLocationCard extends StatelessWidget {
 
@@ -30,7 +32,7 @@ class CurrentLocationCard extends StatelessWidget {
 }
 
 
-class _Card extends StatelessWidget {
+class _Card extends ConsumerWidget {
 
   final String weatherMain;
   final Weather weather;
@@ -41,10 +43,16 @@ class _Card extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
 
     final colors = _getColorsForWeather(weatherMain);
     final countryFullName = countryNames[weather.country] ?? weather.country;
+    final isFahrenheit = ref.watch(unitProvider);
+    final temp = weather.temperature;
+    
+    final displayTemp = isFahrenheit
+        ? (temp * 9/5 + 32).toStringAsFixed(1)
+        : temp.toStringAsFixed(1);
 
     return Container(
       decoration: BoxDecoration(
@@ -66,7 +74,6 @@ class _Card extends StatelessWidget {
                 weather.city,
                 countryFullName,
                 weather.description,
-                //weather.temperature
               )
             ],
           ),
@@ -80,13 +87,15 @@ class _Card extends StatelessWidget {
               Text("Mi Ubicación Actual",
               style: GoogleFonts.inter(
                 fontSize: 15,
-                fontWeight: FontWeight.w500
+                fontWeight: FontWeight.w500,
+                color: Colors.black
               )),
               Padding(
                 padding: const EdgeInsets.only(left: 20),
-                child: Text('${weather.temperature.toStringAsFixed(1)}°C', style: GoogleFonts.inter(
+                child: Text('$displayTemp°${isFahrenheit ? 'F' : 'C'}', style: GoogleFonts.inter(
                   fontSize: 25,
                   fontWeight: FontWeight.w600,
+                  color: Colors.black
                 )),
               ),
             ],
@@ -98,50 +107,6 @@ class _Card extends StatelessWidget {
   }
 }
 
-/*
-
-class _Card extends StatelessWidget {
-
-  final String weatherMain;
-  final Weather weather;
-
-  const _Card({
-    required this.weatherMain,
-    required this.weather
-  });
-
-  @override
-  Widget build(BuildContext context) {
-
-    final colors = _getColorsForWeather(weatherMain);
-    final countryFullName = countryNames[weather.country] ?? weather.country;
-
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        gradient: LinearGradient(
-          colors: colors,
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _ImageCurrentLocationCard(weatherMain),
-          const Spacer(),
-          _InfoCurrentLocationCard(
-            weather.city,
-            countryFullName,
-            weather.description,
-            //weather.temperature
-          )
-        ],
-      ),
-    );
-  }
-}
-*/
 class _ImageCurrentLocationCard extends StatelessWidget {
 
   final String weatherMain;
@@ -160,19 +125,7 @@ class _ImageCurrentLocationCard extends StatelessWidget {
             height: 115,
             width: 110,
             child: _buildSmallLottie(weatherMain),
-          ),/*
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(LucideIcons.mapPin, size: 20, color: Colors.lightBlue),
-              const SizedBox(width: 5),
-              Text("Mi Ubicación Actual",
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                fontWeight: FontWeight.w500
-              )),
-            ],
-          ),*/
+          ),
         ],
       ),
     );
@@ -184,13 +137,11 @@ class _InfoCurrentLocationCard extends StatelessWidget {
   final String city;
   final String country;
   final String description;
-  //final double temperature;
 
   const _InfoCurrentLocationCard(
     this.city,
     this.country,
     this.description,
-    //this.temperature
   );
 
   @override
@@ -202,23 +153,22 @@ class _InfoCurrentLocationCard extends StatelessWidget {
         children: [
           Text(city, style: GoogleFonts.inter(
               fontSize: 20,
-              fontWeight: FontWeight.w600
+              fontWeight: FontWeight.w600,
+              color: Colors.black
             )),
             const SizedBox(height: 3),
             Text(country, style: GoogleFonts.inter(
               fontSize: 13,
-              fontWeight: FontWeight.w500
+              fontWeight: FontWeight.w500,
+              color: Colors.black
+
             )),
             const SizedBox(height: 10),
             Text(description, style:  GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w500,
+              color: Colors.black
             )),
-            /*const SizedBox(height: 8),
-            Text('${temperature.toStringAsFixed(1)}°C', style: GoogleFonts.inter(
-              fontSize: 25,
-              fontWeight: FontWeight.w600,
-            )),*/
         ],
       ),
     );

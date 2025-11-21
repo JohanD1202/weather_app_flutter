@@ -12,6 +12,8 @@ class CustomAppbar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
+    final iconColor = Theme.of(context).iconTheme.color;
+
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -28,7 +30,7 @@ class CustomAppbar extends ConsumerWidget {
                 const SizedBox(width: 20),
                 IconButton(
                   icon: const Icon(LucideIcons.refreshCcw),
-                  color: Colors.black,
+                  color: iconColor,
                   onPressed: () async {
                     ref.read(isRefreshingProvider.notifier).state = true;
                     await ref.read(searchedWeatherProvider.notifier).refresh(ref);
@@ -91,37 +93,43 @@ class _TextField extends ConsumerWidget {
     }
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color;
+    final hintColor = Theme.of(context).hintColor;
+    final iconColor = Theme.of(context).iconTheme.color;
+
+    final theme = Theme.of(context);
+    final fillColor = theme.colorScheme.surface;
+
     return TextField(
       onChanged: (value) => _onQueryChanged(value, ref),
-      style: const TextStyle(color: Colors.black),
+      style: TextStyle(color: textColor),
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
-      hintText: "Ingrese el nombre de la ciudad",
-      hintStyle: const TextStyle(color: Colors.grey),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Colors.grey),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(
-          color: Colors.lightBlue,
-          width: 2,
+        filled: true,
+        fillColor: fillColor,
+        hintText: "Ingrese el nombre de la ciudad",
+        hintStyle: TextStyle(color: hintColor),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Theme.of(context).dividerColor),
         ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
+        ),
+        prefixIcon: Icon(
+          LucideIcons.search,
+          color: iconColor,
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 10),
       ),
-      prefixIcon: const Icon(
-        LucideIcons.search,
-        color: Colors.black,
-      ),
-      contentPadding: const EdgeInsets.symmetric(vertical: 10),
-    ),
-    onSubmitted:(value) => _onSubmitted(value, ref, context)
+      onSubmitted:(value) => _onSubmitted(value, ref, context)
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:weather_app/config/constants/country_names.dart';
 import 'package:weather_app/domain/entities/weather.dart';
+import 'package:weather_app/presentation/providers/preferences/unit_provider.dart';
 import 'package:weather_app/presentation/providers/weather/searched_weather_provider.dart';
 
 class LocationSearchedCard extends ConsumerWidget {
@@ -121,7 +122,7 @@ class _InfoLocationCard extends StatelessWidget {
   }
 }
 
-class _InfoTemperature extends StatelessWidget {
+class _InfoTemperature extends ConsumerWidget {
   
   final double temperature;
   final String description;
@@ -132,13 +133,21 @@ class _InfoTemperature extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    final isFahrenheit = ref.watch(unitProvider);
+    final temp = temperature;
+    
+    final displayTemp = isFahrenheit
+        ? (temp * 9/5 + 32).toStringAsFixed(1)
+        : temp.toStringAsFixed(1);
+
     return Padding(
       padding: const EdgeInsets.only(right: 20, top: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text('${temperature.toStringAsFixed(1)}°C', style: GoogleFonts.inter(
+          Text('$displayTemp°${isFahrenheit ? 'F' : 'C'}', style: GoogleFonts.inter(
             fontSize: 15,
             fontWeight: FontWeight.w600,
           )),

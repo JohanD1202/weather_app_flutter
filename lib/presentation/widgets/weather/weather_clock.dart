@@ -46,6 +46,7 @@ class _WeatherClockState extends State<WeatherClock> {
       style: GoogleFonts.inter(
         fontSize: 30,
         fontWeight: FontWeight.w600,
+        color: Colors.black
       ),
     );
   }

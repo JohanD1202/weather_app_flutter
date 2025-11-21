@@ -58,11 +58,11 @@ class _WeatherBottomNavigationBar extends StatelessWidget {
       height: 80,
       child: BottomNavigationBar(
         iconSize: 30,
-        backgroundColor: Colors.white.withValues(alpha: 0.85),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         currentIndex: currentIndex,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(context).textTheme.bodySmall?.color,
         showUnselectedLabels: true,
         onTap: onTap,
         items: const [

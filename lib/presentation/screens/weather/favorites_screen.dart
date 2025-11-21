@@ -6,6 +6,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:weather_app/config/constants/country_names.dart';
 import 'package:weather_app/domain/entities/weather.dart';
 import 'package:weather_app/infrastructure/services/shared_preferences/favorites_provider.dart.dart';
+import 'package:weather_app/presentation/providers/preferences/unit_provider.dart';
 
 class FavoritesScreen extends ConsumerWidget {
 
@@ -17,21 +18,29 @@ class FavoritesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 
     final favorites = ref.watch(favoritesProvider);
+    final styleTitle = Theme.of(context).textTheme.titleLarge?.copyWith(
+      fontWeight: FontWeight.w600,
+      fontSize: 20
+    );
+    final styleText = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      fontWeight: FontWeight.w600,
+      fontSize: 15
+    );
+    final styleIcon = Theme.of(context).iconTheme.color;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis Favoritos'),
-      titleTextStyle: GoogleFonts.inter(
-        fontSize: 15,
-        color: Colors.black,
-        fontWeight: FontWeight.w600
-      ),
+      appBar: AppBar(title: Text('Mis Favoritos'),
+      titleTextStyle: styleTitle,
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 20),
           child: GestureDetector(
-            child: const Icon(
+            onTap: () {
+              context.push('/settings');
+            },
+            child: Icon(
               LucideIcons.settings,
-              color: Colors.black,
+              color: styleIcon,
               size: 25,
             ),
           ),
@@ -41,10 +50,8 @@ class FavoritesScreen extends ConsumerWidget {
       body: favorites.isEmpty
         ? Center(
           child: Text("Aún no tienes ciudades favoritas", 
-          style: GoogleFonts.inter(
-            fontSize: 15,
-            fontWeight: FontWeight.w600
-          )),
+          style: styleText
+        ),
         )
         : ListView.builder(
         itemCount: favorites.length,
@@ -70,28 +77,6 @@ class FavoritesScreen extends ConsumerWidget {
   }
 }
 
-  /*
-  List<Weather> favorites = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadFavorites();
-  }
-
-  void _loadFavorites() async {
-    favorites = await getFavorites();
-    setState(() {});
-  }
-
-  void _removeFavorite(Weather weather) async {
-    await toggleFavorite(weather);
-    _loadFavorites();
-  }*/
-
-  
-
-
 class _FavoritesCard extends StatelessWidget {
   final Weather weather;
   final VoidCallback onRemove;
@@ -105,11 +90,11 @@ class _FavoritesCard extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final countryFullName = countryNames[weather.country] ?? weather.country;
-
+    
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         child: Row(
           children: [
             _InfoLocationCard(weather.city, countryFullName),
@@ -163,7 +148,7 @@ class _InfoLocationCard extends StatelessWidget {
   }
 }
 
-class _InfoTemperatureCard extends StatelessWidget {
+class _InfoTemperatureCard extends ConsumerWidget {
 
   final double temperature;
   final String description;
@@ -174,11 +159,19 @@ class _InfoTemperatureCard extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    final isFahrenheit = ref.watch(unitProvider);
+    final temp = temperature;
+    
+    final displayTemp = isFahrenheit
+        ? (temp * 9/5 + 32).toStringAsFixed(1)
+        : temp.toStringAsFixed(1);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text('${temperature.toStringAsFixed(1)}°C', 
+        Text('$displayTemp°${isFahrenheit ? 'F' : 'C'}', 
         style: GoogleFonts.inter(
           fontSize: 15,
           fontWeight: FontWeight.w600,
