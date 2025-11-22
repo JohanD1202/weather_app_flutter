@@ -22,7 +22,7 @@ class LocationSearchedCard extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 0, 15, 10),
       child: Dismissible(
-        key: ValueKey(weather.city + weather.country),
+        key: ValueKey('${weather.city}_${weather.country}_${weather.lat}_${weather.lon}'),
         direction: DismissDirection.endToStart,
         background: Container(
           alignment: Alignment.centerRight,
@@ -31,9 +31,21 @@ class LocationSearchedCard extends ConsumerWidget {
           child: const Icon(Icons.delete, color: Colors.white),
         ),
         onDismissed: (_) {
+          final textTheme = Theme.of(context);
+          final backgroundTheme = Theme.of(context).scaffoldBackgroundColor;
+
           ref.read(searchedWeatherProvider.notifier).removeWeather(weather);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${weather.city} eliminada')),
+            SnackBar(
+              content: LocalizedText(
+                translations: {
+                  "es": '${weather.city} eliminada',
+                  "en": '${weather.city} deleted'
+                },
+                style: textTheme.textTheme.bodyLarge,
+              ),
+              backgroundColor: backgroundTheme,
+            ),
           );
         },
         child: GestureDetector(

@@ -7,7 +7,11 @@ import 'package:weather_app/infrastructure/services/shared_preferences/theme_not
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
-  runApp(const ProviderScope(child: MainApp()));
+  runApp(
+    const ProviderScope(
+      child: MainApp()
+    )
+  );
 }
 
 final themeNotifier = ThemeNotifier();

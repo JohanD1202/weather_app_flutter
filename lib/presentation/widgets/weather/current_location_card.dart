@@ -47,64 +47,64 @@ class _Card extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final colors = _getColorsForWeather(weatherMain);
-    //final countryFullName = countryNames[weather.country] ?? weather.country;
 
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        gradient: LinearGradient(
-          colors: colors,
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _ImageCurrentLocationCard(weatherMain),
-              const Spacer(),
-              _InfoCurrentLocationCard(
-                weather.city,
-                weather.country,
-                weather.description,
-              )
-            ],
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          gradient: LinearGradient(
+            colors: colors,
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
           ),
-          Row(
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 12, bottom: 5),
-                child: Icon(LucideIcons.mapPin, size: 20, color: Colors.lightBlue),
-              ),
-              const SizedBox(width: 5),
-              LocalizedText(
-                translations: const {
-                  "es": "Mi Ubicación Actual",
-                  "en": "My Current Location"
-                },
-              style: GoogleFonts.inter(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: Colors.black
-              )),
-              Padding(
-                padding: const EdgeInsets.only(left: 20),
-                child: TemperatureText(
-                  celsius: weather.temperature,
-                  style: GoogleFonts.inter(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black
-                  )
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _ImageCurrentLocationCard(weatherMain),
+                const Spacer(),
+                _InfoCurrentLocationCard(
+                  weather.city,
+                  weather.country,
+                  weather.description,
+                )
+              ],
+            ),
+            Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(left: 12, bottom: 5),
+                  child: Icon(LucideIcons.mapPin, size: 20, color: Colors.lightBlue),
                 ),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
+                const SizedBox(width: 5),
+                LocalizedText(
+                  translations: const {
+                    "es": "Mi Ubicación Actual",
+                    "en": "My Current Location"
+                  },
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black
+                )),
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: TemperatureText(
+                    celsius: weather.temperature,
+                    style: GoogleFonts.inter(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black
+                    )
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      );
   }
 }
 

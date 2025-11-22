@@ -24,13 +24,13 @@ class SearchScreen extends StatelessWidget {
         preferredSize: Size.fromHeight(95),
         child: CustomAppbar(),
       ),
-      body: _BodySavedScreen()
+      body: _BodySearchScreen()
     );
   }
 }
 
-class _BodySavedScreen extends ConsumerWidget {
-  const _BodySavedScreen();
+class _BodySearchScreen extends ConsumerWidget {
+  const _BodySearchScreen();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -99,25 +99,81 @@ class _BodySavedScreen extends ConsumerWidget {
                           final countryNormalized = city.country.trim().toLowerCase();
 
                           final existingList = ref.read(searchedWeatherProvider);
-                          final exists = existingList.any(
-                            (w) =>
-                              w.city.trim().toLowerCase() == cityNameNormalized &&
-                              w.country.trim().toLowerCase() == countryNormalized,
+                          final exists = isCityAlreadyAdded(
+                            lat: city.lat,
+                            lon: city.lon,
+                            list: existingList
                           );
 
                           if(exists) {
+                            final textTheme = Theme.of(context);
+                            final backgroundTheme = Theme.of(context).scaffoldBackgroundColor;
+                            
                             messenger.showSnackBar(
-                              const SnackBar(content: Text("La ciudad ya está en la lista")),
+                              SnackBar(
+                                content: LocalizedText(
+                                  translations: const  {
+                                    "es": "La ciudad ya está en la lista",
+                                    "en": "The city is already on the list"
+                                  },
+                                  style: textTheme.textTheme.bodyLarge,
+                                ),
+                                backgroundColor: backgroundTheme,
+                              ),
                             );
                             ref.read(searchQueryProvider.notifier).state = '';
                             return; // salir antes de hacer la búsqueda
                           }
+                          final messenger2 = ScaffoldMessenger.of(context);
+                          final textTheme = Theme.of(context);
+                          final backgroundTheme = Theme.of(context).scaffoldBackgroundColor;
 
-                          await ref.read(weatherByCityProvider.notifier).search(city.name);
+                          await ref.read(weatherByCityProvider.notifier).searchByCoords(
+                            lat: city.lat,
+                            lon: city.lon
+                          );
                           final weather = ref.read(weatherByCityProvider).value;
-                          if (weather != null) {
-                            ref.read(searchedWeatherProvider.notifier).addWeather(weather);
+
+                          if(weather == null) {
+                            messenger2.showSnackBar(
+                              SnackBar(
+                                content: LocalizedText(
+                                  translations: const {
+                                    "es": "No se pudo obtener el clima para esta ciudad",
+                                    "en": "The weather forecast for this city could not be obtained."
+                                  },
+                                  style: textTheme.textTheme.bodyLarge,
+                                ),
+                                backgroundColor: backgroundTheme,
+                              ),
+                            );
+                            return;
                           }
+                          await ref.read(weatherByCityProvider.notifier).search(city.name);
+                          final weather2 = ref.read(weatherByCityProvider).value;
+                          if (weather2 == null) {
+                            messenger.showSnackBar(
+                              SnackBar(
+                                content: LocalizedText(
+                                  translations: const {
+                                    "es": "No se pudo obtener el clima para esta ciudad",
+                                    "en": "The weather forecast for this city could not be obtained."
+                                  },
+                                  style: textTheme.textTheme.bodyLarge,
+                                ),
+                                backgroundColor: backgroundTheme,
+                              ),
+                            );
+                            return;
+                          }
+                          
+                          // Sobrescribir lat/lon con las coordenadas exactas de la ciudad
+                          final weatherWithCoords = weather.copyWith(
+                            lat: city.lat,
+                            lon: city.lon,
+                          );
+
+                          ref.read(searchedWeatherProvider.notifier).addWeather(weatherWithCoords);
 
                           ref.read(searchQueryProvider.notifier).state = '';
                       },

@@ -17,8 +17,10 @@ class SearchedWeatherNotifier extends StateNotifier<List<Weather>> {
   }
 
   void removeWeather(Weather weather) {
+    const epsilon = 0.00001; // tolerancia para comparaciones de doubles
     state = state.where((w) =>
-      w.city != weather.city || w.country != weather.country
+      (w.lat - weather.lat).abs() > epsilon ||
+      (w.lon - weather.lon).abs() > epsilon
     ).toList();
   }
 

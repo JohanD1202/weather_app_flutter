@@ -24,7 +24,10 @@ class WeatherInfo extends StatelessWidget {
 
     return Stack(
       children: [
-        WeatherBackground(weatherMain: weather.main),
+        WeatherBackground(
+          weatherMain: weather.main,
+          timezone: weather.timezone,
+        ),
         SingleChildScrollView(
           child: Column(
             children: [

@@ -1,7 +1,7 @@
 const Map<String, Map<String, String>> weatherDescriptions = {
   "cielo despejado": {"es": "cielo despejado", "en": "clear sky"},
   "pocas nubes": {"es": "pocas nubes", "en": "few clouds"},
-  "nubes dispersas": {"es": "pubes dispersas", "en": "scattered clouds"},
+  "nubes dispersas": {"es": "nubes dispersas", "en": "scattered clouds"},
   "muy nuboso": {"es": "muy nuboso", "en": "very cloudy"},
   "nubes": {"es": "nubes", "en": "clouds"},
   "algo de nubes": {"es": "algo de nubes", "en": "some clouds"},
@@ -9,6 +9,7 @@ const Map<String, Map<String, String>> weatherDescriptions = {
   "cielo cubierto": {"es": "cielo cubierto", "en": "overcast clouds"},
   "chubascos": {"es": "chubascos", "en": "shower rain"},
   "lluvia ligera": {"es": "lluvia ligera", "en": "light rain"},
+  "llovizna ligera": {"es": "llovizna ligera", "en": "light drizzle"},
   "lluvia moderada": {"es": "lluvia moderada", "en": "moderate rain"},
   "lluvia intensa": {"es": "lluvia intensa", "en": "heavy rain"},
   "lluvia muy intensa": {"es": "lluvia muy intensa", "en": "very heavy rain"},

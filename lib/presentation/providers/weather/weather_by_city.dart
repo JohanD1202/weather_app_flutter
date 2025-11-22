@@ -22,6 +22,24 @@ class WeatherByCityNotifier extends AsyncNotifier<Weather?> {
       state = const AsyncData(null);
     }
   }
+
+  Future<void> searchByCoords({
+  required double lat,
+  required double lon,
+}) async {
+  state = const AsyncLoading();
+
+  try {
+    final repo = ref.read(weatherRepositoryProvider);
+    final weather = await repo.getCurrentWeatherByLocation(
+      lat: lat,
+      lon: lon
+    );
+    state = AsyncData(weather);
+  } catch (e) {
+    state = const AsyncData(null);
+  }
+}
 }
 
 final weatherByCityProvider =

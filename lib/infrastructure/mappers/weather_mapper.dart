@@ -26,6 +26,8 @@ class WeatherMapper {
     tempMax: openWeather.main.tempMax,
     sunrise: openWeather.sys.sunrise,
     sunset: openWeather.sys.sunset,
-    windGust: openWeather.wind.gust ?? 0.0
+    windGust: openWeather.wind.gust ?? 0.0,
+    lat: openWeather.coord.lat,
+    lon: openWeather.coord.lon
   );
 }

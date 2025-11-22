@@ -54,8 +54,8 @@ class _WeatherBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
+    return SafeArea(
+      top: false,
       child: BottomNavigationBar(
         iconSize: 30,
         backgroundColor: Theme.of(context).colorScheme.surface,

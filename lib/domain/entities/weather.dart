@@ -17,6 +17,8 @@ class Weather {
   final int sunrise;
   final int sunset;
   final double windGust;
+  final double lat;
+  final double lon;
 
   const Weather({
     required this.city,
@@ -36,8 +38,56 @@ class Weather {
     required this.tempMax,
     required this.sunrise,
     required this.sunset,
-    required this.windGust
+    required this.windGust,
+    required this.lat,
+    required this.lon
   });
+
+  Weather copyWith({
+    String? city,
+    double? temperature,
+    String? description,
+    double? feelsLike,
+    int? humidity,
+    double? windSpeed,
+    int? windDeg,
+    String? main,
+    String? country,
+    int? cloudiness,
+    int? pressure,
+    int? timezone,
+    int? visibility,
+    double? tempMin,
+    double? tempMax,
+    int? sunrise,
+    int? sunset,
+    double? windGust,
+    double? lat,
+    double? lon,
+  }) {
+    return Weather(
+      city: city ?? this.city,
+      temperature: temperature ?? this.temperature,
+      description: description ?? this.description,
+      feelsLike: feelsLike ?? this.feelsLike,
+      humidity: humidity ?? this.humidity,
+      windSpeed: windSpeed ?? this.windSpeed,
+      windDeg: windDeg ?? this.windDeg,
+      main: main ?? this.main,
+      country: country ?? this.country,
+      cloudiness: cloudiness ?? this.cloudiness,
+      pressure: pressure ?? this.pressure,
+      timezone: timezone ?? this.timezone,
+      visibility: visibility ?? this.visibility,
+      tempMin: tempMin ?? this.tempMin,
+      tempMax: tempMax ?? this.tempMax,
+      sunrise: sunrise ?? this.sunrise,
+      sunset: sunset ?? this.sunset,
+      windGust: windGust ?? this.windGust,
+      lat: lat ?? this.lat,
+      lon: lon ?? this.lon,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'city': city,
@@ -57,7 +107,9 @@ class Weather {
     'tempMax' : tempMax,
     'sunrise' : sunrise,
     'sunset' : sunset,
-    'windGust' : windGust
+    'windGust' : windGust,
+    'lat' : lat,
+    'lon' : lon
   };
 
   factory Weather.fromJson(Map<String, dynamic> json) => Weather(
@@ -79,5 +131,7 @@ class Weather {
     sunrise: json['sunrise'] ?? 0,
     sunset: json['sunset'] ?? 0,
     windGust: (json['windGust'] ?? json['wind_gust'] ?? 0).toDouble(),
+    lat: json['lat'],
+    lon: json['lon']
   );
 }

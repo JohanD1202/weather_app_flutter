@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:weather_app/config/constants/country_names.dart';
+import 'package:weather_app/config/constants/weather_descriptions.dart';
 import 'package:weather_app/domain/entities/weather.dart';
 import 'package:weather_app/infrastructure/services/shared_preferences/favorites_provider.dart';
 import 'package:weather_app/presentation/widgets/shared/localized_text.dart';
@@ -31,6 +32,7 @@ class FavoritesScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         title: const LocalizedText(
           translations: {
             "es": "Mis Favoritos",
@@ -104,12 +106,13 @@ class _FavoritesCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
         child: Row(
           children: [
             _InfoLocationCard(weather.city, weather.country),
             const Spacer(),
             _InfoTemperatureCard(weather.temperature, weather.description),
+            const SizedBox(width: 5),
             IconButton(
               icon: const Icon(Icons.star),
               color: Colors.yellow,
@@ -184,7 +187,10 @@ class _InfoTemperatureCard extends StatelessWidget {
           fontWeight: FontWeight.w600,
         )),
         const SizedBox(height: 3),
-        Text(description, style: GoogleFonts.inter(
+        LocalizedText(
+          translations: weatherDescriptions[description.toLowerCase()] ??
+          {"es": description, "en": description},
+          style: GoogleFonts.inter(
           fontSize: 10,
           fontWeight: FontWeight.w500
         ),

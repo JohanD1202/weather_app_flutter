@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:weather_app/domain/entities/city.dart';
+import 'package:weather_app/domain/entities/weather.dart';
 import 'package:weather_app/infrastructure/services/shared_preferences/language_provider.dart';
 import 'package:weather_app/presentation/providers/suggestions/search_query_provider.dart';
 import 'package:weather_app/presentation/providers/weather/is_refreshing_provider.dart';
@@ -29,7 +31,7 @@ class CustomAppbar extends ConsumerWidget {
                     child: _TextField(),
                   ),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 5),
                 IconButton(
                   icon: const Icon(LucideIcons.refreshCcw),
                   color: iconColor,
@@ -39,11 +41,114 @@ class CustomAppbar extends ConsumerWidget {
                     ref.read(isRefreshingProvider.notifier).state = false;
                   },
                 ),
+                IconButton(
+                  icon: const Icon(LucideIcons.trash2),
+                  color: iconColor,
+                  onPressed: () {
+
+                    final list = ref.read(searchedWeatherProvider);
+                    final textTheme = Theme.of(context);
+                    final backgroundTheme = Theme.of(context).scaffoldBackgroundColor;
+
+                    if(list.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: LocalizedText(
+                            translations: const {
+                              "es": "No hay ciudades para borrar",
+                              "en": "There are no cities to delete"
+                            },
+                            style: textTheme.textTheme.bodyLarge,
+                          ),
+                          backgroundColor: backgroundTheme,
+                        ),
+                      );
+                      return;
+                    }
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const _AlertDialog();
+                      },
+                    );
+                  },
+                ),
               ],
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AlertDialog extends ConsumerWidget {
+  const _AlertDialog();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+
+    final textTheme = Theme.of(context).textTheme;
+    final backgroundTheme = Theme.of(context).scaffoldBackgroundColor;
+
+    return AlertDialog(
+      backgroundColor: backgroundTheme,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      title: LocalizedText(
+        translations: const {
+          "es": "¿Borrar todas las ciudades?",
+          "en": "Delete all cities?"
+        },
+        style: textTheme.titleLarge,
+      ),
+      content: LocalizedText(
+        translations: const {
+          "es": "Esta acción eliminará toda la lista de resultados",
+          "en": "This action will remove the entire results list"
+        },
+        style: textTheme.bodyMedium,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: LocalizedText(
+            translations: const {
+              "es": "Cancelar",
+              "en": "Cancel"
+            },
+            style: textTheme.bodyMedium,
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            ref.read(searchedWeatherProvider.notifier).clear();
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: LocalizedText(
+                  translations: const {
+                    "es": "Las ciudades se eliminaron correctamente",
+                    "en": "The cities were removed correctly"
+                  },
+                  style: textTheme.bodyLarge,
+                ),
+                backgroundColor: backgroundTheme,
+              ),
+            );
+          },
+          child: LocalizedText(
+            translations: const {
+              "es": "Borrar",
+              "en": "Delete"
+            },
+              style: textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -77,10 +182,10 @@ class _TextField extends ConsumerWidget {
   
       // Verificar duplicados por ciudad + país
       final existingList = ref.read(searchedWeatherProvider);
-      final exists = existingList.any(
-        (w) =>
-            w.city.trim().toLowerCase() == weather.city.trim().toLowerCase() &&
-            w.country.trim().toLowerCase() == weather.country.trim().toLowerCase(),
+      final exists = isCityAlreadyAdded(
+        lat: weather.lat,
+        lon: weather.lon,
+        list:existingList
       );
   
       if (exists) {
@@ -98,9 +203,30 @@ class _TextField extends ConsumerWidget {
         );
         return;
       }
-  
-      // Agregar la ciudad
-      ref.read(searchedWeatherProvider.notifier).addWeather(weather);
+      await ref.read(weatherByCityProvider.notifier).search(weather.city);
+      final weather2 = ref.read(weatherByCityProvider).value;
+      if (weather2 == null) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: LocalizedText(
+              translations: const {
+                "es": "No se pudo obtener el clima para esta ciudad",
+                "en": "The weather forecast for this city could not be obtained."
+              },
+              style: textTheme.textTheme.bodyLarge,
+            ),
+            backgroundColor: backgroundTheme,
+          ),
+        );
+        return;
+      }
+
+      // Sobrescribir lat/lon con las coordenadas exactas de la ciudad
+      final weatherWithCoords = weather.copyWith(
+        lat: weather.lat,
+        lon: weather.lon,
+      );
+      ref.read(searchedWeatherProvider.notifier).addWeather(weatherWithCoords);
     } catch (e) {
       messenger.showSnackBar(
         SnackBar(
@@ -163,3 +289,17 @@ class _TextField extends ConsumerWidget {
     );
   }
 }
+
+bool isCityAlreadyAdded({
+  required double lat,
+  required double lon,
+  required List<Weather> list,
+}) {
+  const epsilon = 0.00001;
+  return list.any((w) =>
+    (w.lat - lat).abs() < epsilon &&
+    (w.lon - lon).abs() < epsilon
+  );
+}
+
+
