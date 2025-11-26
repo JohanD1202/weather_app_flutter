@@ -20,6 +20,7 @@ class CityResult {
   final double latitude;
   final double longitude;
   final int? population;
+  final String type;
 
   CityResult({
     required this.city,
@@ -28,6 +29,7 @@ class CityResult {
     required this.latitude,
     required this.longitude,
     this.population,
+    required this.type
   });
 
   factory CityResult.fromJson(Map<String, dynamic> json) => CityResult(
@@ -37,5 +39,6 @@ class CityResult {
         latitude: (json['latitude'] as num).toDouble(),
         longitude: (json['longitude'] as num).toDouble(),
         population: json['population'],
+        type: json['type'],
       );
 }

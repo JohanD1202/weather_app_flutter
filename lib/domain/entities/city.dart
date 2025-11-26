@@ -5,6 +5,7 @@ class City {
   final double lat;
   final double lon;
   final int? population;
+  final String type;
 
   City({
     required this.name,
@@ -12,6 +13,7 @@ class City {
     required this.region,
     required this.lat,
     required this.lon,
-    required this.population
+    required this.population,
+    required this.type
   });
 }

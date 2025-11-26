@@ -31,7 +31,13 @@ class SearchedWeatherNotifier extends StateNotifier<List<Weather>> {
     for(final weather in state) {
       try {
         final refreshed = await api.getWeatherById(weather.id);
-        updatedList.add(refreshed);
+        final merged = refreshed.copyWith(
+          lat: weather.lat,
+          lon: weather.lon,
+          city: weather.city,
+          country: weather.country,
+        );
+        updatedList.add(merged);
       } catch (_) {
         updatedList.add(weather);
       }

@@ -105,7 +105,7 @@ class _FavoritesCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 17),
         child: Row(
           children: [
             _InfoLocationCard(weather.city, weather.country),

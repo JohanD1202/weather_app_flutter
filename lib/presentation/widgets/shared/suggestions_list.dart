@@ -128,8 +128,10 @@ class _SuggestionTile extends ConsumerWidget {
     }
 
     final weatherWithCoords = weather.copyWith(
+      id: weather.id,
       lat: city.lat,
       lon: city.lon,
+      city: city.name,
     );
 
     ref.read(searchedWeatherProvider.notifier).addWeather(weatherWithCoords);

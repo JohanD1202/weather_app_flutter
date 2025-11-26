@@ -69,15 +69,20 @@ class OpenWeatherDatasourceImpl extends WeathersDatasource {
     );
     final CityModelResponse model = CityModelResponse.fromJson(response.data);
 
-  return model.data.map((c) {
-    return City(
-      name: c.city,
-      country: c.country,
-      region: c.region,
-      lat: c.latitude,
-      lon: c.longitude,
-      population: c.population
-    );
-  }).toList();
+    final filtered = model.data
+      .where((c) => c.type == "CITY")
+      .toList();
+
+    return filtered.map((c) {
+      return City(
+        name: c.city,
+        country: c.country,
+        region: c.region,
+        lat: c.latitude,
+        lon: c.longitude,
+        population: c.population,
+        type: c.type
+      );
+    }).toList();
   }
 }
